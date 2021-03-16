@@ -6,7 +6,7 @@
 		"validate:dev": "svelte-check --ignore .svelte --watch",
 		"svelte-kit:dev": "svelte-kit dev",
 		"svelte-kit:build": "svelte-kit build",
-		"dev": "NODE_ENV=development run-p validate:dev svelte-kit:dev",
+		"dev": "run-p validate:dev svelte-kit:dev",
 		"build": "run-s validate svelte-kit:build",
 		"start": "svelte-kit start"
 	},
