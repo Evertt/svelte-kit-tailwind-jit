@@ -2,12 +2,11 @@
   import { createSWR } from "sswr"
 
   export const fetchAndCache = async (url: string, fetch?: typeof window.fetch) => {
-    const request = new Request(url)
-
     if (typeof window === "undefined") {
       return fetch(url)
     }
 
+    const request = new Request(url)
     fetch = fetch || window.fetch
 
     const cache = await window.caches.open("fetcher")
@@ -16,6 +15,7 @@
     if (cachedResp) {
       const date = new Date(cachedResp.headers.get("date"))
       if (new Date().getTime() - date.getTime() < 10000) {
+        console.log(`Serving cached version of ${url}`)
         return cachedResp
       }
     }
@@ -28,6 +28,7 @@
   }
 
   const swr = createSWR<any>({
+    dedupingInterval: 20000,
     fetcher: async (url: string) => {
       if (typeof fetch === "undefined") {
         return new Promise<void>(r => r())
