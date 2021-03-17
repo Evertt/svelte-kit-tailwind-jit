@@ -1,43 +1,31 @@
 <script context="module">
   import { createSWR } from "sswr"
 
-  export const fetchAndCache = async (url: string, fetch?: typeof window.fetch) => {
-    if (typeof window === "undefined") {
-      return fetch(url)
-    }
-
-    const request = new Request(url)
-    fetch = fetch || window.fetch
-
-    const cache = await window.caches.open("fetcher")
-    const cachedResp = await cache.match(request)
-
-    if (cachedResp) {
-      const date = new Date(cachedResp.headers.get("date"))
-      if (new Date().getTime() - date.getTime() < 10000) {
-        console.log(`Serving cached version of ${url}`)
-        return cachedResp
-      }
-    }
-
-    const resp = await fetch(url)
-    const headers = new Headers(resp.headers)
-    headers.append("date", new Date().toUTCString())
-    await cache.put(request, new Response(resp.clone().body, { headers }))
-    return resp
-  }
-
-  const swr = createSWR<any>({
-    dedupingInterval: 20000,
+  export const swr = createSWR({
+    dedupingInterval: 10000,
     fetcher: async (url: string) => {
-      if (typeof fetch === "undefined") {
-        return new Promise<void>(r => r())
-      } else {
-        const resp = await fetchAndCache(url)
-        return resp.json()
-      }
+      const fetch = typeof window !== 'undefined'
+        ? window.fetch
+        : await import('node-fetch')
+            .then(mod => mod.default)
+
+      const resp = await fetch(url)
+      if (!resp.ok) throw resp
+      return resp.json()
     }
   })
+
+  export const swrLoad = async (url: string) => {
+    try {
+      await swr.useSWR(url)
+      return { props: { url } }
+    } catch (e) {
+      return {
+        status: (e as Response).status,
+        error: new Error(`Could not load ${url}`)
+      }
+    }
+  }
 </script>
 
 <script>
@@ -48,9 +36,7 @@
 
   const {
     data: store, error, mutate, revalidate, clear, unsubscribe
-  } = swr.useSWR(url)
-
-  store.set(initialData)
+  } = swr.useSWR(url, { initialData })
 
   $: list = $store as any[]
   $: model = $store as any

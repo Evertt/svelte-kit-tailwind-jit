@@ -12,7 +12,7 @@ devDependencies:
   postcss-cli: 8.3.1_postcss@8.2.8
   postcss-load-config: 3.0.1
   postcss-nested: 5.0.5_postcss@8.2.8
-  sswr: github.com/Evertt/sswr/c09098478c68e0a771b457bc440528328c3d311b
+  sswr: github.com/Evertt/sswr/d48053b8611413e9756fd543f73cca62eb9e3276
   svelte: 3.35.0
   svelte-check: 1.2.5_019da5987046f7cef513105c1bc21bab
   svelte-preprocess: 4.6.9_bfabe6c7bc3d73e76d0bc9dab084c580
@@ -2155,6 +2155,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==
+  /rxjs/6.6.6:
+    dependencies:
+      tslib: 1.14.1
+    dev: true
+    engines:
+      npm: '>=2.0.0'
+    resolution:
+      integrity: sha512-/oTwee4N4iWzAMAL9xdGKjkEHmIwupR3oXbQjCKywF1BeFohswF3vZdogbmEF6pZkOsXTzWkrZszrWpQTByYVg==
   /sade/1.7.4:
     dependencies:
       mri: 1.1.6
@@ -2440,10 +2448,6 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-yhy/sQYxR5BkC98CY7o31VGsg014AKLEPxdfhora76l36hD9Rdy5NZA/Ocn6yayNPgSamYdtX2rFJdcv07AYVw==
-  /swrev/1.7.0:
-    dev: true
-    resolution:
-      integrity: sha512-zIS4CuyRGXVd7CwQOdzswQHselWmbuHQt5Jn6ckVvFOZXXpnM2Z13UxueYUvDJ+Hlp5Dqi8j5tmxtcuE16YT4w==
   /tailwindcss/2.0.3_caf414ac65a978d0d57907a0ec9fb41e:
     dependencies:
       '@fullhuman/postcss-purgecss': 3.1.3
@@ -2489,6 +2493,10 @@ packages:
       node: '>=8.0'
     resolution:
       integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==
+  /tslib/1.14.1:
+    dev: true
+    resolution:
+      integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
   /tslib/2.1.0:
     dev: true
     resolution:
@@ -2634,15 +2642,23 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==
-  github.com/Evertt/sswr/c09098478c68e0a771b457bc440528328c3d311b:
+  github.com/Evertt/sswr/d48053b8611413e9756fd543f73cca62eb9e3276:
     dependencies:
       svelte: 3.35.0
-      swrev: 1.7.0
+      swrev: github.com/Evertt/swrev/2ce32b133cd3fa5cecf5f33644dcd146ab22e253
     dev: true
     name: sswr
     resolution:
-      tarball: https://codeload.github.com/Evertt/sswr/tar.gz/c09098478c68e0a771b457bc440528328c3d311b
+      tarball: https://codeload.github.com/Evertt/sswr/tar.gz/d48053b8611413e9756fd543f73cca62eb9e3276
     version: 1.0.1
+  github.com/Evertt/swrev/2ce32b133cd3fa5cecf5f33644dcd146ab22e253:
+    dependencies:
+      rxjs: 6.6.6
+    dev: true
+    name: swrev
+    resolution:
+      tarball: https://codeload.github.com/Evertt/swrev/tar.gz/2ce32b133cd3fa5cecf5f33644dcd146ab22e253
+    version: 1.7.0
 specifiers:
   '@sveltejs/adapter-node': next
   '@sveltejs/adapter-static': ^1.0.0-next.0
