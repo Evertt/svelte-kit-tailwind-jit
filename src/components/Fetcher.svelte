@@ -4,12 +4,11 @@
   const preloadedData = new Map<string, any>()
 
   export const swr = createSWR({
-    dedupingInterval: 10000,
-    loadInitialCache: true,
+    dedupingInterval: 10_000,
     fetcher: async (url: string) => {
-      const fetch = typeof window !== 'undefined'
+      const fetch = typeof window !== "undefined"
         ? window.fetch
-        : await import('node-fetch')
+        : await import("node-fetch")
             .then(mod => mod.default)
 
       const resp = await fetch(url)
@@ -34,6 +33,7 @@
 
 <script>
   import { onDestroy } from "svelte"
+  import { fade } from "svelte/transition"
 
   export let url: string
   export let initialData: any = preloadedData.get(url)
@@ -48,14 +48,26 @@
   onDestroy(unsubscribe)
 </script>
 
-{#if $error}
-  <slot name="error" {error}>
-    Something went wrong...
-  </slot>
-{:else if $store}
+{#if $store}
   <slot {list} {model} {mutate} {revalidate} {clear} />
+{:else if $error}
+  <slot name="error" error={$error}>
+    <div><p>{$error}</p></div>
+  </slot>
 {:else}
   <slot name="loading">
-    Loading...
+    <div in:fade={{ duration: 100, delay: 200 }}>
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="m-auto" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+        <circle cx="50" cy="50" fill="none" stroke="#85a2b6" stroke-width="10" r="35" stroke-dasharray="164.93361431346415 56.97787143782138">
+          <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1.5s" values="0 50 50;360 50 50" keyTimes="0;1"></animateTransform>
+        </circle>
+      </svg>
+    </div>
   </slot>
 {/if}
+
+<style>
+  div {
+    @apply flex items-center justify-center w-full h-full max-w-sm p-4 m-auto max-h-64;
+  }
+</style>

@@ -12,7 +12,7 @@ devDependencies:
   postcss-cli: 8.3.1_postcss@8.2.8
   postcss-load-config: 3.0.1
   postcss-nested: 5.0.5_postcss@8.2.8
-  sswr: github.com/Evertt/sswr/17097303c2de72bda9b78ca32bf7b9a64d99f3e5
+  sswr: github.com/Evertt/sswr/e7c358402be7d8e390ced60808978ac7120bd3d9
   svelte: 3.35.0
   svelte-check: 1.2.5_019da5987046f7cef513105c1bc21bab
   svelte-preprocess: 4.6.9_bfabe6c7bc3d73e76d0bc9dab084c580
@@ -2642,14 +2642,14 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==
-  github.com/Evertt/sswr/17097303c2de72bda9b78ca32bf7b9a64d99f3e5:
+  github.com/Evertt/sswr/e7c358402be7d8e390ced60808978ac7120bd3d9:
     dependencies:
       svelte: 3.35.0
       swrev: github.com/Evertt/swrev/b587216e44a89d117b72b3ee95faed303c648d93
     dev: true
     name: sswr
     resolution:
-      tarball: https://codeload.github.com/Evertt/sswr/tar.gz/17097303c2de72bda9b78ca32bf7b9a64d99f3e5
+      tarball: https://codeload.github.com/Evertt/sswr/tar.gz/e7c358402be7d8e390ced60808978ac7120bd3d9
     version: 1.0.1
   github.com/Evertt/swrev/b587216e44a89d117b72b3ee95faed303c648d93:
     dependencies:
