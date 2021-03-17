@@ -1,8 +1,11 @@
 <script context="module">
   import { createSWR } from "sswr"
 
+  const preloadedData = new Map<string, any>()
+
   export const swr = createSWR({
     dedupingInterval: 10000,
+    loadInitialCache: true,
     fetcher: async (url: string) => {
       const fetch = typeof window !== 'undefined'
         ? window.fetch
@@ -17,7 +20,8 @@
 
   export const swrLoad = async (url: string) => {
     try {
-      await swr.useSWR(url)
+      preloadedData.clear()
+      preloadedData.set(url, await swr.useSWR(url))
       return { props: { url } }
     } catch (e) {
       return {
@@ -32,7 +36,7 @@
   import { onDestroy } from "svelte"
 
   export let url: string
-  export let initialData: any = null
+  export let initialData: any = preloadedData.get(url)
 
   const {
     data: store, error, mutate, revalidate, clear, unsubscribe
