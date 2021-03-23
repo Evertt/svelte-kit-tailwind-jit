@@ -1,16 +1,5 @@
 <script context="module">
-  import { swrLoad } from "$components/Fetcher.svelte"
-
-  export async function load({ page }) {
-    return swrLoad(`https://jsonplaceholder.typicode.com/posts/${page.params.id}`)
-  }
-</script>
-
-<script>
-  import { swr } from "$components/swr"
-  import Fetcher from "$components/Fetcher.svelte"
-
-  export let url: string
+  import { swr, firstValueFrom } from "$components/swr"
 
   interface Post {
     id: number
@@ -19,27 +8,30 @@
     body: string
   }
 
-  let value = "https://jsonplaceholder.typicode.com/posts/15"
-	const { data: store, errors } = swr.use<Post>(value)
-	
-	const rev = () => swr.revalidate(value)
-  store.subscribe(resp => console.log(resp))
+  export async function load({ page }) {
+    const url = `https://jsonplaceholder.typicode.com/posts/${page.params.id}`
+    const { data: post, errors, mutate } = swr.use<Post>(url)
+    await firstValueFrom(post)
+    return { props: { post, errors, mutate } }
+  }
+</script>
+
+<script>
+  import type { Observable } from "rxjs"
+  import type { SwrReturn } from "$components/swr"
+
+  export let post: Observable<Post>
+  export let errors: Observable<any>
+  export let mutate: SwrReturn["mutate"]
 </script>
 
 <main class="px-12 py-6">
-  <!-- <Fetcher {url} let:model={post}>
-    <h1 class="text-center">{post.title}</h1>
-    <p>{post.body}</p>
-  </Fetcher> -->
-
-  <input class="px-1 border-2 rounded border-blue-500" bind:value />
-  <button class="py-1 px-2 bg-red-600 rounded text-white" on:click={rev}>revalidate</button>
-  
-  {#if $store}
-    <h1>{JSON.stringify($store)}</h1>
+  {#if $post}
+    <h1 class="text-center">{$post.title}</h1>
+    <p>{$post.body}</p>
   {/if}
 
-  {#if $errors}
-    <h2>{JSON.stringify($errors)}</h2>
-  {/if}
+  <button on:click={_ => mutate()}>revalidate</button>
+
+  {#if $errors}<h2>{JSON.stringify($errors)}</h2>{/if}
 </main>
