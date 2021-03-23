@@ -14,11 +14,10 @@ devDependencies:
   postcss-cli: 8.3.1_postcss@8.2.8
   postcss-load-config: 3.0.1
   postcss-nested: 5.0.5_postcss@8.2.8
-  rxios: 2.0.0_axios@0.21.1+rxjs@6.6.6
-  rxjs: 6.6.6
+  rxjs: 7.0.0-beta.13
   sswr: github.com/Evertt/sswr/e7c358402be7d8e390ced60808978ac7120bd3d9
   svelte: 3.35.0
-  svelte-check: 1.2.5_019da5987046f7cef513105c1bc21bab
+  svelte-check: 1.2.6_019da5987046f7cef513105c1bc21bab
   svelte-preprocess: 4.6.9_bfabe6c7bc3d73e76d0bc9dab084c580
   tailwindcss: 2.0.3_caf414ac65a978d0d57907a0ec9fb41e
   tslib: 2.1.0
@@ -2187,16 +2186,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==
-  /rxios/2.0.0_axios@0.21.1+rxjs@6.6.6:
-    dependencies:
-      axios: 0.21.1
-      rxjs: 6.6.6
-    dev: true
-    peerDependencies:
-      axios: ~0.18.0
-      rxjs: ^6.1.0
-    resolution:
-      integrity: sha512-yOH90tVMytVKu+P+cMgIIM5nBG/tEgh6chip6xEHDUQkAZl81QL86waa6WlrqVmlCfPK6vezm2sjEeKP6zUGhw==
   /rxjs/6.6.6:
     dependencies:
       tslib: 1.14.1
@@ -2205,6 +2194,12 @@ packages:
       npm: '>=2.0.0'
     resolution:
       integrity: sha512-/oTwee4N4iWzAMAL9xdGKjkEHmIwupR3oXbQjCKywF1BeFohswF3vZdogbmEF6pZkOsXTzWkrZszrWpQTByYVg==
+  /rxjs/7.0.0-beta.13:
+    dependencies:
+      tslib: 2.1.0
+    dev: true
+    resolution:
+      integrity: sha512-//ll3EfI5SgTfrS5DUjc/uEmyazS0vUDMHqa/GbPR9ubdVLtbrv2bK3y75JyZPfYl1Bq2JbR/IbByhfzfpJyvw==
   /sade/1.7.4:
     dependencies:
       mri: 1.1.6
@@ -2384,7 +2379,7 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==
-  /svelte-check/1.2.5_019da5987046f7cef513105c1bc21bab:
+  /svelte-check/1.2.6_019da5987046f7cef513105c1bc21bab:
     dependencies:
       chalk: 4.1.0
       chokidar: 3.5.1
@@ -2402,7 +2397,7 @@ packages:
       postcss-load-config: '*'
       svelte: ^3.24.0
     resolution:
-      integrity: sha512-1hqlH/J86lpuXk6+SSeZRfCfxXvCpqYGfgPb2sD0YW+tueknbJGR9oaGaLzytU0dgja4ShG+zQzHEsjKb0tFeA==
+      integrity: sha512-jl8rGvL+qfBrGJur/hvY177P9qhbpOLrXLqsSiaWRjI771Us7OPFUaghhtUv9EmET5OT4xtmh5PfxUTxD7UCkg==
   /svelte-hmr/0.13.0_svelte@3.35.0:
     dependencies:
       svelte: 3.35.0
@@ -2717,11 +2712,10 @@ specifiers:
   postcss-cli: ^8.3.1
   postcss-load-config: ^3.0.1
   postcss-nested: ^5.0.5
-  rxios: ^2.0.0
-  rxjs: ^6.6.6
+  rxjs: 7.0.0-beta.13
   sswr: github:Evertt/sswr
   svelte: ^3.29.0
-  svelte-check: ^1.2.5
+  svelte-check: ^1.2.6
   svelte-preprocess: ^4.6.9
   tailwindcss: ^2.0.3
   tslib: ^2.1.0

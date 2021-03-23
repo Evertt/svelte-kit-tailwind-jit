@@ -1,5 +1,6 @@
 <script context="module">
-  import { swr, firstValueFrom } from "$components/swr"
+  import { firstValueFrom } from "rxjs"
+  import { swr } from "$components/swr"
 
   interface Post {
     id: number
@@ -18,7 +19,7 @@
 
 <script>
   import type { Observable } from "rxjs"
-  import type { SwrReturn } from "$components/swr"
+  import type { SwrReturn } from "src/swr"
 
   export let post: Observable<Post>
   export let errors: Observable<any>
@@ -31,7 +32,7 @@
     <p>{$post.body}</p>
   {/if}
 
-  <button on:click={_ => mutate()}>revalidate</button>
+  <button class="p-2 bg-red-600 text-white rounded" on:click={_ => mutate()}>revalidate</button>
 
   {#if $errors}<h2>{JSON.stringify($errors)}</h2>{/if}
 </main>
