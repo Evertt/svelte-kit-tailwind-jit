@@ -1,16 +1,21 @@
 <script context="module">
-  import { swrLoad } from "$components/Fetcher.svelte"
+  import { firstValueFrom } from "rxjs"
+  import { swr } from "$components/swr"
+  import type { Post } from "../models"
 
   export async function load() {
-    return swrLoad("https://jsonplaceholder.typicode.com/posts")
+    const url = "https://jsonplaceholder.typicode.com/posts"
+    const { data: posts } = swr.use<Post[]>(url)
+    await firstValueFrom(posts)
+    return { props: { posts } }
   }
 </script>
 
 <script>
   import Counter from "$components/Counter.svelte"
-  import Fetcher from "$components/Fetcher.svelte"
-  
-  export let url: string
+  import type { Observable } from "rxjs"
+
+  export let posts: Observable<Post[]>
 </script>
 
 <main class="text-center">
@@ -19,16 +24,13 @@
   <Counter />
   <p class="py-8">Visit the <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte apps.</p>
   
-  <Fetcher {url} let:list={posts}>
-    <p slot="error">Something went wrong...</p>
-    <p slot="loading">Loading...</p>
-    
+  {#if $posts}
     <ul>
-      {#each posts as post}
-        <li><a href="{post.id}" sveltekit:prefetch>{post.title}</a></li>
+      {#each $posts as post}
+        <li><a href="/{post.id}" sveltekit:prefetch>{post.title}</a></li>
       {/each}
     </ul>
-  </Fetcher>
+  {/if}
 </main>
 
 <style>
