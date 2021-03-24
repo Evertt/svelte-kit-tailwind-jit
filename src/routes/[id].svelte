@@ -5,16 +5,23 @@
 
   export async function load({ page }) {
     const url = `https://jsonplaceholder.typicode.com/posts/${page.params.id}`
-    const { data: post, errors } = swr.use<Post>(url)
-    await firstValueFrom(post)
-    return { props: { post, errors } }
+    const { data: post, error, isValidating } = swr.use<Post>([url])
+
+    try {
+      await firstValueFrom(post)
+    } catch (e) {
+      return e
+    }
+
+    return { props: { post, error, isValidating } }
   }
 </script>
 
 <script>
   import type { Observable } from "rxjs"
   export let post: Observable<Post>
-  export let errors: Observable<any>
+  export let error: Observable<any>
+  export let isValidating: Observable<boolean>
 </script>
 
 <main class="px-12 py-6">
@@ -23,5 +30,11 @@
     <p>{$post.body}</p>
   {/if}
 
-  {#if $errors}<h2>{JSON.stringify($errors)}</h2>{/if}
+  {#if $error && $isValidating}
+    <p>Something's not going right, but I'm trying...</p>
+  {:else if $isValidating}
+    <p>Loading...</p>
+  {:else if $error}
+    <p>Sorry, I failed...</p>
+  {/if}
 </main>

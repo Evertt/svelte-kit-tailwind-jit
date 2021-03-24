@@ -5,7 +5,7 @@
 
   export async function load() {
     const url = "https://jsonplaceholder.typicode.com/posts"
-    const { data: posts } = swr.use<Post[]>(url)
+    const { data: posts } = swr.use<Post[]>([url])
     await firstValueFrom(posts)
     return { props: { posts } }
   }

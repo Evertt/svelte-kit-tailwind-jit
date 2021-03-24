@@ -1,7 +1,11 @@
 import { SWR, wrapFetch } from "../swr"
 
-if (typeof window !== "undefined") {
-  SWR.fetch = wrapFetch(window.fetch)
+let options: any = {}
+
+if (typeof fetch !== "undefined") {
+  SWR.fetch = wrapFetch(fetch)
+} else {
+  options.errorRetryCount = 0
 }
 
-export const swr = new SWR<typeof fetch>({ fetcher: SWR.fetch })
+export const swr = new SWR<typeof fetch>({ fetcher: SWR.fetch, ...options })
