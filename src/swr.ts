@@ -1,7 +1,6 @@
-import { NEVER, merge, Observable, defer, Subscription, EMPTY } from "rxjs"
-import { map, filter, finalize, catchError, tap } from "rxjs/operators"
-import { fromWindowEvent } from "./common"
-import type { CacheItem } from "./common"
+import { NEVER, Observable, defer, EMPTY } from "rxjs"
+import { finalize, catchError } from "rxjs/operators"
+import { CacheItem } from "./common"
 import { retryWithDelay } from "./rxjs-operators"
 import StorageCache from "./cache"
 
@@ -16,22 +15,24 @@ export interface SwrReturn<T = any> {
   mutate: (data?: DataArg<T>, revalidate?: boolean) => void
 }
 
-interface AllOptions<F extends Fetcher> {
+type RequiredOptions<F extends Fetcher> = {
   fetcher: F
+}
+
+type DefaultOptions = {
   dedupingInterval: number
   errorRetryInterval: number
   errorRetryCount: number
 }
 
-type RequiredOptionKeys = "fetcher"
+type AllOptions<F extends Fetcher> =
+  RequiredOptions<F> & DefaultOptions
 
-type PartialOptions<F extends Fetcher> =
-  Partial<Omit<AllOptions<F>, RequiredOptionKeys>>
+type Options<F extends Fetcher> =
+  Partial<AllOptions<F>>
 
-type Options<F extends Fetcher> = 
-  PartialOptions<F> & Pick<AllOptions<F>, RequiredOptionKeys>
-
-type DefaultOptions = Omit<AllOptions<Fetcher>, RequiredOptionKeys>
+type InitOptions<F extends Fetcher> =
+  RequiredOptions<F> & Partial<DefaultOptions>
 
 type UseOptions = {
   initialData?: any
@@ -49,14 +50,14 @@ export class SWR<F extends Fetcher> {
   private options: AllOptions<F>
   private cache = new StorageCache()
 
-  constructor(options: Options<F>) {
+  constructor(options: InitOptions<F>) {
     this.options = { ...SWR.options, ...options }
   }
 
   private async mutate<T = any>(
     key: string, data?: DataArg<T>,
-    shouldRevalidate?: boolean,
-    options: Partial<AllOptions<F>> = {}
+    shouldRevalidate: boolean = !data,
+    options: Options<F> = {}
   ): Promise<T> {
     const cache = this.cache.get(key)
     if (!cache) return
@@ -64,46 +65,36 @@ export class SWR<F extends Fetcher> {
 
     if (typeof data === "function") {
       data = (data as (data: T) => T)(cacheItem.data as T)
-      if (!shouldRevalidate) shouldRevalidate = false // in case it's null
     }
 
     if (data instanceof Promise) {
       cache.isValidating.next(true)
       data = await data
-      if (!shouldRevalidate) {
-        shouldRevalidate = false
-        cache.isValidating.next(false)
-      }
+      cache.isValidating.next(false)
     }
 
-    data && cache.source.next({
-      data, expiresAt: Date.now() + 6000
-    })
-
-    if (shouldRevalidate == null) shouldRevalidate = true
-    shouldRevalidate && this.revalidate(key, cacheItem, true, options)
+    const opts = { ...this.options, ...options }
+    const expiresAt = Date.now() + opts.dedupingInterval
+    data && cache.source.next(new CacheItem(data, expiresAt))
+    this.revalidate(key, cacheItem, shouldRevalidate, options)
 
     return data as T
   }
 
-  private revalidate(
-    key: string, item: CacheItem, force: boolean,
-    options: Partial<AllOptions<F>> = {}
-  ) {
-    if (force || !item || this.cache.isExpired(item))
-      this.requestData(key, options)
+  private revalidate(key: string, item: CacheItem, force: boolean, options: Options<F> = {}) {
+    if (force || !item || item.isExpired) this.requestData(key, options)
   }
 
-  private async requestData(key: string, options: Partial<AllOptions<F>> = {}) {
+  private async requestData(key: string, options: Options<F> = {}) {
     const args = JSON.parse(key)
     const cache = this.cache.get(key)
     if (!cache) return
 
-    options = { ...this.options, ...options }
+    const opts = { ...this.options, ...options }
 
     defer(async () => {
       cache.isValidating.next(true)
-      return await options.fetcher(...args)
+      return await opts.fetcher(...args)
     })
     .pipe(
       catchError(error => {
@@ -111,8 +102,8 @@ export class SWR<F extends Fetcher> {
         throw error
       }),
       retryWithDelay(
-        options.errorRetryInterval,
-        options.errorRetryCount
+        opts.errorRetryInterval,
+        opts.errorRetryCount
       ),
       catchError(error => {
         if (!cache.source.value) {
@@ -123,14 +114,15 @@ export class SWR<F extends Fetcher> {
       }),
       finalize(() => cache.isValidating.next(false))
     ).subscribe(data => {
-      cache.source.next({ data, expiresAt: Date.now() + options.dedupingInterval })
+      const expiresAt = Date.now() + opts.dedupingInterval
+      cache.source.next(new CacheItem(data, expiresAt))
       if (cache.errors.value) cache.errors.next(undefined)
     })
   }
 
-  public use<T = any>(argsFactory: () => Parameters<F>, options?: Partial<AllOptions<F>> & UseOptions): SwrReturn<T>
-  public use<T = any>(args: Parameters<F>, options?: Partial<AllOptions<F>> & UseOptions): SwrReturn<T>
-  public use<T = any>(args: Parameters<F>|(() => Parameters<F>), options: Partial<AllOptions<F>> & UseOptions = {}): SwrReturn<T> {
+  public use<T = any>(argsFactory: () => Parameters<F>, options?: Options<F> & UseOptions): SwrReturn<T>
+  public use<T = any>(args: Parameters<F>, options?: Options<F> & UseOptions): SwrReturn<T>
+  public use<T = any>(args: Parameters<F>|(() => Parameters<F>), options: Options<F> & UseOptions = {}): SwrReturn<T> {
     try {
       args = Array.isArray(args) ? args : args()
     } catch (_) {

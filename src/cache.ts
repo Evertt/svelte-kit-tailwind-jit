@@ -1,9 +1,6 @@
-import { BehaviorSubject, defer, merge, Observable, Subscription } from "rxjs"
-import { filter, finalize, map, tap } from "rxjs/operators"
-import type { CacheItem } from "./common"
-import { fromWindowEvent } from "./common"
-
-const storageEvents = fromWindowEvent("storage")
+import { BehaviorSubject, defer, EMPTY, fromEvent, merge, Observable, Subscription } from "rxjs"
+import { filter, finalize, map, share, tap } from "rxjs/operators"
+import { CacheItem } from "./common"
 
 interface Cache {
   data: Observable<any>
@@ -18,6 +15,11 @@ type CacheOptions = {
   revalidate: (key: string, item: CacheItem) => void
 }
 
+const fromWindowEvent = (event: string) =>
+  typeof window !== "undefined"
+    ? fromEvent(window, event).pipe(share()) : EMPTY
+
+const storageEvents = fromWindowEvent("storage")
 const windowEvents = merge(
   fromWindowEvent("focus"),
   fromWindowEvent("online")
@@ -55,7 +57,8 @@ export default class StorageCache {
     const map = this.getMapFromStorage()
 
     map.forEach((item, key) => {
-      if (this.isExpired(item)) return map.delete(key)
+      item = new CacheItem(item.data, item.expiresAt)
+      if (item.isExpired) return map.delete(key)
       if (!this.cache.has(key)) return
       const cache = this.cache.get(key)
       const currentItem = cache.source.value
@@ -68,7 +71,7 @@ export default class StorageCache {
 
   private getItemFromStorage(key: string): CacheItem|undefined {
     const item = this.getMapFromStorage().get(key)
-    return item && !this.isExpired(item) ? item : undefined
+    return item?.isExpired ? item : undefined
   }
 
   public saveItemInStorage(key: string, item: CacheItem) {
@@ -79,10 +82,6 @@ export default class StorageCache {
   public removeItemFromStorage(key: string) {
     const map = this.getMapFromStorage()
     map.delete(key) && this.saveMapInStorage(map)
-  }
-
-  public isExpired(cacheItem: CacheItem) {
-    return cacheItem.expiresAt < Date.now()
   }
 
   public get(key: string) {
@@ -99,7 +98,7 @@ export default class StorageCache {
     const cache = this.cache.get(key)
     const item = cache.source.value
 
-    if (item && this.isExpired(item)) {
+    if (item?.isExpired) {
       this.removeItemFromStorage(key)
     }
 
@@ -112,7 +111,7 @@ export default class StorageCache {
     let initialData = this.getItemFromStorage(key) || options?.initialData
 
     if (initialData && initialData.expiresAt === undefined) {
-      initialData = { expiresAt: 0, data: initialData }
+      initialData = new CacheItem(initialData, 0)
     }
 
     this.cache.set(key, {

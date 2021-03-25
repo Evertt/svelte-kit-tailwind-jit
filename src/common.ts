@@ -1,11 +1,13 @@
-import { EMPTY, fromEvent } from "rxjs"
-import { share } from "rxjs/operators"
+export class CacheItem {
+  public data: any
+  public expiresAt: number
 
-export interface CacheItem {
-  expiresAt: number
-  data: any
+  get isExpired() {
+    return this.expiresAt <= Date.now()
+  }
+
+  constructor(data: any, expiresAt: number) {
+    this.data = data
+    this.expiresAt = expiresAt
+  }
 }
-
-export const fromWindowEvent = (event: string) =>
-  typeof window !== "undefined"
-    ? fromEvent(window, event).pipe(share()) : EMPTY
