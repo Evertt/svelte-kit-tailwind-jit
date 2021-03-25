@@ -5,7 +5,7 @@
 
   export async function load({ page }) {
     const url = `https://jsonplaceholder.typicode.com/posts/${page.params.id}`
-    const { data: post, error, isValidating } = swr.use<Post>([url])
+    const { data: post, error, isValidating } = swr.use<Post>(url)
 
     try {
       await firstValueFrom(post)

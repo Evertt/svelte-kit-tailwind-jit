@@ -38,6 +38,12 @@ type UseOptions = {
   initialData?: any
 }
 
+type FetchParamFactories<F extends Fetcher> = 
+  (() => Parameters<F> | Parameters<F>[0])
+
+type FetchParamOptions<F extends Fetcher> =
+  Parameters<F> | Parameters<F>[0] | FetchParamFactories<F>
+
 export class SWR<F extends Fetcher> {
   static fetch: Fetcher
   
@@ -120,11 +126,16 @@ export class SWR<F extends Fetcher> {
     })
   }
 
-  public use<T = any>(argsFactory: () => Parameters<F>, options?: Options<F> & UseOptions): SwrReturn<T>
-  public use<T = any>(args: Parameters<F>, options?: Options<F> & UseOptions): SwrReturn<T>
-  public use<T = any>(args: Parameters<F>|(() => Parameters<F>), options: Options<F> & UseOptions = {}): SwrReturn<T> {
+  public resolveArgs(args: FetchParamOptions<F>): Parameters<F> {
+    if (Array.isArray(args)) return args
+    if (typeof args !== "function") return [args] as Parameters<F>
+    args = (args as FetchParamFactories<F>)()
+    return Array.isArray(args) ? args : [args] as Parameters<F>
+  }
+
+  public use<T = any>(args: FetchParamOptions<F>, options: Options<F> & UseOptions = {}): SwrReturn<T> {
     try {
-      args = Array.isArray(args) ? args : args()
+      args = this.resolveArgs(args)
     } catch (_) {
       return {
         data: NEVER, error: NEVER,
